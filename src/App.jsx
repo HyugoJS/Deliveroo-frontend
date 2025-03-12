@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import "./App.css";
 import axios from "axios";
-import logo from "./assets/logo.png";
 import { FaStar } from "react-icons/fa";
 import Header from "./components/Header";
 import Baseline from "./components/Baseline";
+import Meal from "./components/Meal";
+import Basket from "./components/Basket";
+import "./App.css";
 
 function App() {
   const [data, setData] = useState({});
@@ -20,6 +21,17 @@ function App() {
     setIsLoading(false);
     // console.log(data);
   };
+  // la fonction doit parcourir tout les éléments du tableau, et additioner toute les clés article.price
+  const sumBasketItems = () => {
+    let total = 0;
+    for (let i = 0; i < basket.length; i++) {
+      // console.log(basket[i].price);
+      total += Number(basket[i].price * basket[i].quantity);
+    }
+    return total;
+  };
+
+  // sumBasketItems();
   useEffect(() => {
     fetchData();
   }, []);
@@ -27,9 +39,7 @@ function App() {
     <span>En cours de chargement...</span>
   ) : (
     <div className="container">
-      <header>
-        <img src={logo} alt="" />
-      </header>
+      <Header />
 
       {/*  */}
       <main>
@@ -50,6 +60,11 @@ function App() {
                           {category.meals.map((meal, index) => {
                             return (
                               <>
+                                {/* <Meal
+                                  meal={meal}
+                                  basket={basket}
+                                  setBasket={setBasket}
+                                /> */}
                                 <div
                                   className="repas"
                                   key={index}
@@ -120,9 +135,31 @@ function App() {
                         <div className="basket-line">
                           <div>
                             {/* gerer les boutons */}
-                            <button>-</button>
+                            <button
+                              onClick={() => {
+                                const copy = [...basket];
+                                if (copy[index].quantity !== 1) {
+                                  copy[index].quantity--;
+                                } else {
+                                  copy.splice(index, 1);
+                                }
+
+                                setBasket(copy);
+                              }}
+                            >
+                              -
+                            </button>
                             {basket[index].quantity}
-                            <button>+</button>
+                            <button
+                              onClick={() => {
+                                const copy = [...basket];
+                                copy[index].quantity++;
+                                setBasket(copy);
+                              }}
+                            >
+                              +
+                            </button>
+                            {console.log(basket[index].quantity)}
                           </div>
                           <span>{article.title}</span>
                           <span>
@@ -137,6 +174,7 @@ function App() {
                   {/* sous-total, frais */}
                   <div>
                     <p>Sous-total</p>
+                    <p>{sumBasketItems().toFixed(2)}€</p>
 
                     {/* <p>{article.price}</p> */}
                   </div>
@@ -145,14 +183,15 @@ function App() {
                     <p>{2.5}€</p>
                   </div>
                 </div>
-                <div className="basket-total">{/* total */}</div>
+                <div className="basket-total">
+                  {/* total */}
+                  <p>Total</p>
+                  <p>{sumBasketItems() + 2.5}€</p>
+                </div>
               </div>
             ) : (
               <p className="empty-basket">Votre panier est vide</p>
             )}
-            {/* ici, mapper le panier. Le contenu du panier doit apparaitre, 
-            en mettant des onclick sur les plats, stocket les plats clickés dans le state Basket, 
-            et mapper ce state  */}
           </div>
         </div>
       </main>
